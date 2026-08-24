@@ -180,11 +180,21 @@ export const createSchema = async (data) => {
   return res.data;
 };
 
+export const deleteSchema = async (schemaId) => {
+  const res = await api.delete(`/api/admin/config/schemas/${schemaId}`);
+  return res.data;
+};
+
 // Versions
 export const createDraftVersion = async (schemaId, createdBy = 'admin') => {
   const res = await api.post(`/api/admin/config/schemas/${schemaId}/draft`, null, {
     params: { createdBy },
   });
+  return res.data;
+};
+
+export const deleteVersion = async (versionId) => {
+  const res = await api.delete(`/api/admin/config/versions/${versionId}`);
   return res.data;
 };
 

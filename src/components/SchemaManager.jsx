@@ -3,7 +3,9 @@ import {
   getSchemas,
   getSchemaDetails,
   createSchema,
+  deleteSchema,
   createDraftVersion,
+  deleteVersion,
   rollbackVersion,
 } from '../api/adminApi';
 
@@ -82,6 +84,33 @@ export const SchemaManager = ({
     }
   };
 
+  const handleDeleteSchema = async (schema) => {
+    if (!window.confirm(`Are you sure you want to permanently delete the Form Schema "${schema.name}" and all its versions?`)) {
+      return;
+    }
+    try {
+      await deleteSchema(schema.id);
+      await loadSchemas();
+    } catch (err) {
+      alert('Failed to delete schema: ' + (err.response?.data?.message || err.message));
+    }
+  };
+
+  const handleDeleteVersion = async (version) => {
+    if (!window.confirm(`Are you sure you want to delete Version V${version.versionNumber} (${version.status})?`)) {
+      return;
+    }
+    try {
+      await deleteVersion(version.id);
+      if (selectedSchema) {
+        await handleSelectSchema(selectedSchema);
+      }
+      await loadSchemas();
+    } catch (err) {
+      alert('Failed to delete version: ' + (err.response?.data?.message || err.message));
+    }
+  };
+
   const handleCreateSchemaSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -141,28 +170,42 @@ export const SchemaManager = ({
                 {schemas.map((s) => {
                   const isSelected = selectedSchema?.id === s.id;
                   return (
-                    <button
+                    <div
                       key={s.id}
-                      type="button"
                       className={`list-group-item list-group-item-action p-3 d-flex justify-content-between align-items-center ${
                         isSelected ? 'bg-primary text-white active' : ''
                       }`}
+                      style={{ cursor: 'pointer' }}
                       onClick={() => handleSelectSchema(s)}
                     >
-                      <div>
+                      <div style={{ flex: 1 }}>
                         <div className="fw-bold">{s.name}</div>
                         <small className={isSelected ? 'text-white-50' : 'text-muted'}>
                           Type: {s.auditType.toUpperCase()}
                         </small>
                       </div>
-                      <span
-                        className={`badge ${
-                          isSelected ? 'bg-light text-primary' : 'bg-secondary'
-                        }`}
-                      >
-                        v{s.activeVersionNumber || 1} Active
-                      </span>
-                    </button>
+                      <div className="d-flex align-items-center gap-2">
+                        <span
+                          className={`badge ${
+                            isSelected ? 'bg-light text-primary' : 'bg-secondary'
+                          }`}
+                        >
+                          v{s.activeVersionNumber || 1} Active
+                        </span>
+                        <button
+                          type="button"
+                          className={`btn btn-sm p-1 ${isSelected ? 'text-white' : 'text-danger'}`}
+                          style={{ border: 'none', background: 'transparent' }}
+                          title={`Delete "${s.name}"`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteSchema(s);
+                          }}
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                    </div>
                   );
                 })}
               </div>
@@ -173,20 +216,30 @@ export const SchemaManager = ({
           <div className="col-md-8">
             {selectedSchema && (
               <div className="card shadow-sm border-0" style={{ borderRadius: '12px' }}>
-                <div className="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <div className="card-header bg-white py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
                   <div>
                     <h5 className="fw-bold text-dark mb-0">{selectedSchema.name}</h5>
                     <small className="text-muted">
                       Active Version: <strong>V{selectedSchema.activeVersionNumber || 1}</strong>
                     </small>
                   </div>
-                  <button
-                    type="button"
-                    className="btn btn-success btn-sm px-3 fw-bold"
-                    onClick={() => handleCreateDraft(selectedSchema.id)}
-                  >
-                    + Open / Create Draft Version
-                  </button>
+                  <div className="d-flex gap-2 align-items-center">
+                    <button
+                      type="button"
+                      className="btn btn-outline-danger btn-sm px-3 fw-bold"
+                      onClick={() => handleDeleteSchema(selectedSchema)}
+                      title="Delete this entire schema and all its versions"
+                    >
+                      🗑️ Delete Schema
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-success btn-sm px-3 fw-bold"
+                      onClick={() => handleCreateDraft(selectedSchema.id)}
+                    >
+                      + Open / Create Draft Version
+                    </button>
+                  </div>
                 </div>
 
                 <div className="card-body p-0">
@@ -235,13 +288,23 @@ export const SchemaManager = ({
                               <td className="text-end">
                                 <div className="btn-group btn-group-sm">
                                   {isDraft ? (
-                                    <button
-                                      type="button"
-                                      className="btn btn-primary"
-                                      onClick={() => onOpenBuilder(v.id)}
-                                    >
-                                      🛠️ Edit Draft
-                                    </button>
+                                    <>
+                                      <button
+                                        type="button"
+                                        className="btn btn-primary"
+                                        onClick={() => onOpenBuilder(v.id)}
+                                      >
+                                        🛠️ Edit Draft
+                                      </button>
+                                      <button
+                                        type="button"
+                                        className="btn btn-outline-danger"
+                                        onClick={() => handleDeleteVersion(v)}
+                                        title="Delete this draft version"
+                                      >
+                                        🗑️
+                                      </button>
+                                    </>
                                   ) : (
                                     <>
                                       <button
@@ -258,6 +321,16 @@ export const SchemaManager = ({
                                           onClick={() => handleRollback(v.id)}
                                         >
                                           Rollback to this
+                                        </button>
+                                      )}
+                                      {versions.length > 1 && (
+                                        <button
+                                          type="button"
+                                          className="btn btn-outline-danger"
+                                          onClick={() => handleDeleteVersion(v)}
+                                          title="Delete this version"
+                                        >
+                                          🗑️
                                         </button>
                                       )}
                                     </>
