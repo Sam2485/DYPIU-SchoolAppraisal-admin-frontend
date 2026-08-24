@@ -204,7 +204,7 @@ export const SchemaManager = ({
                       </thead>
                       <tbody>
                         {versions.map((v) => {
-                          const isDraft = 'DRAFT'.equalsIgnoreCase(v.status);
+                          const isDraft = String(v.status || '').toUpperCase() === 'DRAFT';
                           const isActive = v.id === selectedSchema.activeVersionId;
                           return (
                             <tr key={v.id}>
