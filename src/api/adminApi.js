@@ -270,4 +270,20 @@ export const reorderFields = async (tableId, fieldIds) => {
   return res.data;
 };
 
+// University Leadership (IQAC & VC user management)
+export const getUniversityLeadership = async (universityId) => {
+  const res = await api.get(`/api/users/university/${universityId}`);
+  return res.data?.users || [];
+};
+
+export const createOrUpdateLeadership = async (universityId, data) => {
+  const res = await api.post(`/api/users/university/${universityId}/leadership`, data);
+  return res.data;
+};
+
+export const deleteUniversityLeadership = async (universityId, userId) => {
+  const res = await api.delete(`/api/users/university/${universityId}/leadership/${userId}`);
+  return res.data;
+};
+
 export default api;

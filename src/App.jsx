@@ -5,10 +5,12 @@ import { UniversityManager } from './components/UniversityManager';
 import { SchemaManager } from './components/SchemaManager';
 import { FormBuilderCanvas } from './components/FormBuilderCanvas';
 import { LiveFormPreview } from './components/LiveFormPreview';
+import { UniversityLeadershipModal } from './components/UniversityLeadershipModal';
 
 export default function App() {
   const [universities, setUniversities] = useState([]);
   const [selectedUniversity, setSelectedUniversity] = useState(null);
+  const [leadershipModalUni, setLeadershipModalUni] = useState(null);
   const [currentTab, setCurrentTab] = useState('schemas'); // 'universities', 'schemas', 'builder', 'preview'
   const [activeVersionId, setActiveVersionId] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -72,6 +74,7 @@ export default function App() {
         currentTab={currentTab}
         onChangeTab={setCurrentTab}
         onOpenNewUniversity={() => setCurrentTab('universities')}
+        onOpenLeadership={(u) => setLeadershipModalUni(u)}
       />
 
       <main className="flex-grow-1">
@@ -113,6 +116,16 @@ export default function App() {
           />
         )}
       </main>
+
+      {/* Quick Access Leadership Modal */}
+      <UniversityLeadershipModal
+        university={leadershipModalUni}
+        isOpen={!!leadershipModalUni}
+        onClose={() => {
+          setLeadershipModalUni(null);
+          loadUniversities();
+        }}
+      />
     </div>
   );
 }

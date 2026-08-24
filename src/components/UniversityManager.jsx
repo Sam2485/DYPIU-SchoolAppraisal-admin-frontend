@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { createUniversity, updateUniversity } from '../api/adminApi';
+import { UniversityLeadershipModal } from './UniversityLeadershipModal';
 
 export const UniversityManager = ({
   universities = [],
@@ -9,6 +10,7 @@ export const UniversityManager = ({
 }) => {
   const [showModal, setShowModal] = useState(false);
   const [editingUniversity, setEditingUniversity] = useState(null);
+  const [leadershipTargetUni, setLeadershipTargetUni] = useState(null);
   const [formData, setFormData] = useState({
     code: '',
     name: '',
@@ -129,6 +131,14 @@ export const UniversityManager = ({
                       onClick={() => onSelectUniversity(u)}
                     >
                       {isSelected ? '✓ Selected' : 'Select'}
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-sm btn-outline-dark"
+                      onClick={() => setLeadershipTargetUni(u)}
+                      title="Configure IQAC & VC accounts"
+                    >
+                      👥 Leadership
                     </button>
                     <button
                       type="button"
@@ -267,6 +277,16 @@ export const UniversityManager = ({
           </div>
         </div>
       )}
+
+      {/* Leadership Accounts Modal */}
+      <UniversityLeadershipModal
+        university={leadershipTargetUni}
+        isOpen={!!leadershipTargetUni}
+        onClose={() => {
+          setLeadershipTargetUni(null);
+          onReload?.();
+        }}
+      />
     </div>
   );
 };

@@ -7,6 +7,7 @@ export const Navbar = ({
   currentTab,
   onChangeTab,
   onOpenNewUniversity,
+  onOpenLeadership,
 }) => {
   return (
     <nav className="navbar navbar-expand-lg navbar-dark studio-navbar px-4 py-2 sticky-top shadow">
@@ -49,8 +50,18 @@ export const Navbar = ({
               onClick={onOpenNewUniversity}
               title="Add New University"
             >
-              + New University
+              + New
             </button>
+            {selectedUniversity && (
+              <button
+                className="btn btn-sm btn-warning fw-semibold ms-1"
+                type="button"
+                onClick={() => onOpenLeadership(selectedUniversity)}
+                title="Manage IQAC and VC Accounts"
+              >
+                👥 Leadership (IQAC / VC)
+              </button>
+            )}
           </div>
         </div>
 
