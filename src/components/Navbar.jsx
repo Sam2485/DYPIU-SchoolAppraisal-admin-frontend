@@ -27,14 +27,6 @@ export const Navbar = ({
             Registered Universities: <strong className="text-white">{universities.length}</strong>
           </div>
 
-          <button
-            className="btn btn-sm btn-primary fw-bold px-3 py-2 shadow-sm"
-            type="button"
-            onClick={onOpenNewUniversity}
-          >
-            ➕ Onboard New University
-          </button>
-
           {selectedUniversity && (
             <button
               className="btn btn-sm btn-warning text-dark fw-bold px-3 py-2 shadow-sm"

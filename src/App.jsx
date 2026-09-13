@@ -52,10 +52,6 @@ export default function App() {
         universities={universities}
         selectedUniversity={selectedUniversity}
         onSelectUniversity={(u) => setSelectedUniversity(u)}
-        onOpenNewUniversity={() => {
-          // Scroll to top or trigger add university form
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }}
         onOpenLeadership={(u) => setLeadershipModalUni(u)}
       />
 
