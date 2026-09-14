@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { createUniversity, updateUniversity, uploadAttachment } from '../api/adminApi';
+import { createUniversity, updateUniversity, deleteUniversity, uploadAttachment } from '../api/adminApi';
 import { UniversityLeadershipModal } from './UniversityLeadershipModal';
 import { LogoCropModal } from './LogoCropModal';
 
@@ -12,6 +12,10 @@ export const UniversityManager = ({
   const [showModal, setShowModal] = useState(false);
   const [editingUniversity, setEditingUniversity] = useState(null);
   const [leadershipTargetUni, setLeadershipTargetUni] = useState(null);
+  const [deleteTargetUni, setDeleteTargetUni] = useState(null);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState(null);
   const [cropConfig, setCropConfig] = useState({
     isOpen: false,
     field: null,
@@ -132,6 +136,25 @@ export const UniversityManager = ({
     }
   };
 
+  const handleConfirmDelete = async () => {
+    if (!deleteTargetUni || deleteConfirmText.trim() !== deleteTargetUni.code) return;
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      await deleteUniversity(deleteTargetUni.id);
+      if (selectedUniversity?.id === deleteTargetUni.id) {
+        onSelectUniversity(null);
+      }
+      setDeleteTargetUni(null);
+      setDeleteConfirmText('');
+      await onReload();
+    } catch (err) {
+      setDeleteError(err.response?.data?.message || err.message || 'Failed to delete university');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   return (
     <div className="container py-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
@@ -223,6 +246,18 @@ export const UniversityManager = ({
                       onClick={() => handleOpenEdit(u)}
                     >
                       ✏️ Edit
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-sm btn-outline-danger"
+                      onClick={() => {
+                        setDeleteError(null);
+                        setDeleteConfirmText('');
+                        setDeleteTargetUni(u);
+                      }}
+                      title="Permanently delete this university"
+                    >
+                      🗑️
                     </button>
                   </div>
                 </div>
@@ -508,6 +543,61 @@ export const UniversityManager = ({
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete University Confirmation Modal */}
+      {deleteTargetUni && (
+        <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }} tabIndex="-1">
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content" style={{ borderRadius: '14px', overflow: 'hidden' }}>
+              <div className="modal-header bg-danger text-white">
+                <h5 className="modal-title fw-bold">⚠️ Delete University</h5>
+                <button
+                  type="button"
+                  className="btn-close btn-close-white"
+                  onClick={() => setDeleteTargetUni(null)}
+                  disabled={deleting}
+                />
+              </div>
+              <div className="modal-body p-4">
+                {deleteError && <div className="alert alert-danger py-2">{deleteError}</div>}
+                <p className="mb-2">
+                  This will permanently delete <strong>{deleteTargetUni.name}</strong> ({deleteTargetUni.code}) and all of its
+                  associated schemas, users, and submissions. <strong>This cannot be undone.</strong>
+                </p>
+                <label className="form-label fw-semibold small mt-3">
+                  Type <code>{deleteTargetUni.code}</code> to confirm:
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={deleteConfirmText}
+                  onChange={(e) => setDeleteConfirmText(e.target.value)}
+                  placeholder={deleteTargetUni.code}
+                  autoFocus
+                />
+              </div>
+              <div className="modal-footer bg-light">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setDeleteTargetUni(null)}
+                  disabled={deleting}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-danger px-4"
+                  disabled={deleting || deleteConfirmText.trim() !== deleteTargetUni.code}
+                  onClick={handleConfirmDelete}
+                >
+                  {deleting ? 'Deleting...' : 'Delete University'}
+                </button>
+              </div>
             </div>
           </div>
         </div>

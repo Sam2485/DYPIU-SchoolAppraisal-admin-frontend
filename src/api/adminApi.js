@@ -162,6 +162,11 @@ export const updateUniversity = async (id, data) => {
   return res.data;
 };
 
+export const deleteUniversity = async (id) => {
+  const res = await api.delete(`/api/universities/${id}`);
+  return res.data;
+};
+
 export const uploadAttachment = async (file) => {
   const formData = new FormData();
   formData.append('file', file);
