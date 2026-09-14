@@ -162,6 +162,20 @@ export const updateUniversity = async (id, data) => {
   return res.data;
 };
 
+export const uploadAttachment = async (file) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  const res = await api.post('/api/attachments/upload', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  const uploaded = res.data?.data || res.data;
+  return {
+    name: uploaded.name || uploaded.fileName || file.name,
+    fileName: uploaded.fileName || uploaded.name || file.name,
+    url: uploaded.url || uploaded.publicUrl || uploaded.downloadUrl || '',
+  };
+};
+
 // Form Schemas
 export const getSchemas = async (universityId, universityCode) => {
   const res = await api.get('/api/admin/config/schemas', {
