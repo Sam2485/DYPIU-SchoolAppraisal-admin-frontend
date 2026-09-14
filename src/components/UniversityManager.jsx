@@ -284,26 +284,15 @@ export const UniversityManager = ({
                         />
                       </div>
 
-                      <div className="row g-2 mb-3">
-                        <div className="col-sm-8">
-                          <label className="form-label fw-semibold">Domain</label>
-                          <input
-                            type="text"
-                            className="form-control"
-                            placeholder="e.g. apex.edu.in"
-                            value={formData.domain}
-                            onChange={(e) => setFormData({ ...formData, domain: e.target.value })}
-                          />
-                        </div>
-                        <div className="col-sm-4">
-                          <label className="form-label fw-semibold">Brand Color</label>
-                          <input
-                            type="color"
-                            className="form-control form-control-color w-100"
-                            value={formData.primaryColor}
-                            onChange={(e) => setFormData({ ...formData, primaryColor: e.target.value })}
-                          />
-                        </div>
+                      <div className="mb-3">
+                        <label className="form-label fw-semibold">Domain</label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="e.g. apex.edu.in"
+                          value={formData.domain}
+                          onChange={(e) => setFormData({ ...formData, domain: e.target.value })}
+                        />
                       </div>
 
                       <div className="mb-3">
